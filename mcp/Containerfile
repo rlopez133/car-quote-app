@@ -1,0 +1,13 @@
+FROM registry.access.redhat.com/ubi9/python-311:latest
+
+WORKDIR /mcp_server
+
+COPY . /mcp_server
+
+EXPOSE 8001
+
+RUN pip install mcp["cli"]
+
+RUN pip install -r requirements.txt
+
+ENTRYPOINT [ "python", "auto_quote_mcp.py" ]
