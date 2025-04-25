@@ -13,7 +13,8 @@ import hashlib
 import random
 
 # Initialize FastMCP
-mcp = FastMCP("auto_quote")
+mcp = FastMCP("auto_quote", port=8001 )
+
 
 # Enums for valid options
 class VehicleCategory(str, Enum):
@@ -735,4 +736,4 @@ def _calculate_discounts(
     return discounts
 
 if __name__ == "__main__":
-    mcp.run(transport="stdio")
+    mcp.run(transport="sse")
