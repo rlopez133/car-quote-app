@@ -97,4 +97,4 @@ Discounts are applied for:
 
 ## License
 
-[Add your license information here]
+MIT License
