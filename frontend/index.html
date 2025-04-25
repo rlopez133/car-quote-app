@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parasol - Car Insurance Quote Calculator</title>
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <h1>Parasol Car Quote Calculator</h1>
+            <p class="tagline">Fast, accurate car insurance quotes</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="quote-calculator">
+            <div class="card">
+                <h2>Get Your Quote</h2>
+                <p>Fill out the form below to receive an instant quote for your vehicle.</p>
+                
+                <form id="quote-form" class="quote-form">
+                    <!-- Vehicle Information -->
+                    <div class="form-section">
+                        <h3>Vehicle Information</h3>
+                        
+                        <div class="form-group">
+                            <label for="vehicle-category">Vehicle Category</label>
+                            <select id="vehicle-category" name="vehicle-category" required>
+                                <option value="" disabled selected>-- Select Category --</option>
+                                <!-- Will be populated dynamically -->
+                            </select>
+                            <p class="help-text">Economy: compact & subcompact cars. Standard: mid-size & family cars. Luxury: high-end & premium vehicles.</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="vehicle-year">Vehicle Year</label>
+                            <select id="vehicle-year" name="vehicle-year" required>
+                                <option value="" disabled selected>-- Select Year --</option>
+                                <!-- Will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="vehicle-value">Vehicle Value</label>
+                            <select id="vehicle-value" name="vehicle-value" required>
+                                <option value="" disabled selected>-- Select Value Range --</option>
+                                <!-- Will be populated dynamically -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="car-ownership">Car Ownership</label>
+                            <select id="car-ownership" name="car-ownership" required>
+                                <option value="" disabled selected>-- Select Ownership --</option>
+                                <!-- Will be populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Driver Information -->
+                    <div class="form-section">
+                        <h3>Driver Information</h3>
+                        
+                        <div class="form-group">
+                            <label for="driver-age">Age of Primary Driver</label>
+                            <input type="number" id="driver-age" name="driver-age" min="16" max="120" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="marital-status">Marital Status</label>
+                            <select id="marital-status" name="marital-status" required>
+                                <option value="" disabled selected>-- Select Status --</option>
+                                <!-- Will be populated dynamically -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="home-ownership">Home Ownership</label>
+                            <select id="home-ownership" name="home-ownership" required>
+                                <option value="" disabled selected>-- Select Ownership --</option>
+                                <!-- Will be populated dynamically -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="driving-frequency">Time Spent Driving</label>
+                            <select id="driving-frequency" name="driving-frequency" required>
+                                <option value="" disabled selected>-- Select Frequency --</option>
+                                <!-- Will be populated dynamically -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="zip-code">ZIP Code</label>
+                            <input type="text" id="zip-code" name="zip-code" pattern="[0-9]{5}" maxlength="5" required>
+                            <p class="help-text">Enter your 5-digit ZIP code</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Coverage Information -->
+                    <div class="form-section">
+                        <h3>Coverage Level</h3>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="basic" name="coverage-level" value="Basic" required>
+                                <label for="basic">Basic</label>
+                                <p class="help-text">Minimal coverage meeting state requirements. Higher out-of-pocket costs if you have an accident.</p>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="standard" name="coverage-level" value="Standard">
+                                <label for="standard">Standard</label>
+                                <p class="help-text">Balanced coverage with moderate out-of-pocket costs. Includes comprehensive and collision.</p>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="premium" name="coverage-level" value="Premium">
+                                <label for="premium">Premium</label>
+                                <p class="help-text">Maximum protection with lowest out-of-pocket costs. Includes all available coverages.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Calculate Quote</button>
+                    </div>
+                </form>
+
+                <div id="quote-result" class="quote-result hidden">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+
+                <div id="loading-spinner" class="loading-spinner hidden">
+                    <div class="spinner"></div>
+                    <p>Calculating your quote...</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <h2>Why Choose Parasol?</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Fast Quotes</h3>
+                    <p>Get your quote in seconds, not minutes.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">💰</div>
+                    <h3>Save Money</h3>
+                    <p>Compare options to find the best value.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure</h3>
+                    <p>Your information is always protected.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <h3>Transparent</h3>
+                    <p>See exactly how your quote is calculated.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2025 Parasol Insurance. All rights reserved.</p>
+            <p class="disclaimer">This is a demo application. Quotes are for illustration purposes only.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
