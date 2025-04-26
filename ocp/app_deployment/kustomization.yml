@@ -1,0 +1,16 @@
+resources:
+  - backend/buildconfig.yml
+  - backend/imagestream.yml
+  - backend/deployment.yml
+  - backend/service.yml
+  - backend/route.yml
+  - frontend/configmap-nginx-conf.yml
+  - frontend/configmap-index-html.yml
+  - frontend/configmap-css-normalize.yml
+  - frontend/configmap-css-styles.yml
+  - frontend/configmap-js-api.yml
+  - frontend/configmap-js-app.yml
+  - frontend/deployment.yml
+  - frontend/service.yml
+  - frontend/route.yml
+

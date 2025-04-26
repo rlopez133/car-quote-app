@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: car-quote-app-frontend
+  labels:
+    app: car-quote-app
+    component: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: car-quote-app
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: car-quote-app
+        component: frontend
+    spec:
+      initContainers:
+      - name: init-nginx
+        image: nginx:1.25-alpine
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          # Create the directory structure
+          mkdir -p /work/css /work/js
+
+          # Copy all files to the shared volume
+          echo "Copying HTML, CSS, and JS files..."
+          cp /configmaps/index.html /work/
+          cp /configmaps/css-normalize/normalize.css /work/css/
+          cp /configmaps/css-styles/styles.css /work/css/
+          cp /configmaps/js-api/api.js /work/js/
+          cp /configmaps/js-app/app.js /work/js/
+
+          # Make content readable
+          echo "Setting permissions..."
+          find /work -type d -exec chmod 755 {} \;
+          find /work -type f -exec chmod 644 {} \;
+          echo "Content initialization complete."
+        volumeMounts:
+        - name: html-content
+          mountPath: /work
+        - name: nginx-index
+          mountPath: /configmaps/index.html
+          subPath: index.html
+        - name: nginx-css-normalize
+          mountPath: /configmaps/css-normalize
+        - name: nginx-css-styles
+          mountPath: /configmaps/css-styles
+        - name: nginx-js-api
+          mountPath: /configmaps/js-api
+        - name: nginx-js-app
+          mountPath: /configmaps/js-app
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          runAsNonRoot: true
+      containers:
+      - name: nginx
+        image: nginx:1.25-alpine
+        ports:
+        - containerPort: 8080
+          name: http
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          runAsNonRoot: true
+        volumeMounts:
+        - name: nginx-conf
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        - name: html-content
+          mountPath: /usr/share/nginx/html
+        - name: tmp-dir
+          mountPath: /tmp
+        env:
+        - name: NGINX_ENTRYPOINT_QUIET_LOGS
+          value: "1"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: car-quote-app-nginx-conf
+          items:
+          - key: nginx.conf
+            path: nginx.conf
+      - name: html-content
+        emptyDir: {}
+      - name: tmp-dir
+        emptyDir: {}
+      - name: nginx-index
+        configMap:
+          name: car-quote-app-index
+      - name: nginx-css-normalize
+        configMap:
+          name: car-quote-app-css-normalize
+      - name: nginx-css-styles
+        configMap:
+          name: car-quote-app-css-styles
+      - name: nginx-js-api
+        configMap:
+          name: car-quote-app-js-api
+      - name: nginx-js-app
+        configMap:
+          name: car-quote-app-js-app

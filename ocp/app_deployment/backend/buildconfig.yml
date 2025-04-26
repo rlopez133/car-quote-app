@@ -1,0 +1,28 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: car-quote-app-backend
+  labels:
+    app: car-quote-app
+    component: backend
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: car-quote-app-backend:latest
+  source:
+    type: Git
+    git:
+      uri: https://github.com/rlopez133/car-quote-app.git
+      ref: main
+    contextDir: backend
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  triggers:
+    - type: ConfigChange
+    - type: GitHub
+      github:
+        secret: webhook-secret-for-github
+

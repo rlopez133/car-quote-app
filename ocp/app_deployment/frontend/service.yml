@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: car-quote-app-frontend
+  labels:
+    app: car-quote-app
+    component: frontend
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: car-quote-app
+    component: frontend

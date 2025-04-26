@@ -1,0 +1,54 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: car-quote-app-nginx-conf
+  labels:
+    app: car-quote-app
+    component: frontend
+data:
+  nginx.conf: |
+    worker_processes  auto;
+    error_log  /dev/stdout info;
+    pid        /tmp/nginx.pid;
+
+    events {
+      worker_connections  1024;
+    }
+
+    http {
+      include       /etc/nginx/mime.types;
+      default_type  application/octet-stream;
+
+      client_body_temp_path /tmp/client_temp;
+      proxy_temp_path       /tmp/proxy_temp;
+      fastcgi_temp_path     /tmp/fastcgi_temp;
+      uwsgi_temp_path       /tmp/uwsgi_temp;
+      scgi_temp_path        /tmp/scgi_temp;
+
+      sendfile        on;
+      keepalive_timeout  65;
+
+      # Basic access logging
+      access_log  /dev/stdout;
+
+      server {
+        listen       8080;
+        server_name  localhost;
+
+        # Static files
+        location / {
+          root   /usr/share/nginx/html;
+          index  index.html;
+          try_files $uri $uri/ /index.html;
+        }
+
+        # Simple API proxy
+        location /api/ {
+          proxy_pass http://car-quote-app-backend:8000/;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+      }
+    }

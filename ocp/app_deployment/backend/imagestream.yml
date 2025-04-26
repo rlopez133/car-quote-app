@@ -1,0 +1,11 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: car-quote-app-backend
+  labels:
+    app: car-quote-app
+    component: backend
+spec:
+  lookupPolicy:
+    local: true
+

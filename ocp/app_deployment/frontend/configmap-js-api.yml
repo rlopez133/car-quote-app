@@ -1,0 +1,132 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: car-quote-app-js-api
+  labels:
+    app: car-quote-app
+    component: frontend
+data:
+  api.js: |
+    /**
+     * API client for the QuoteMaster backend.
+     * Handles all communication with the API endpoints.
+     */
+
+    // Configuration
+    const API_CONFIG = {
+        // Set the API base URL to the backend service via proxy
+        baseUrl: '/api',
+        endpoints: {
+            years: '/vehicle-years',
+            categories: '/vehicle-categories',
+            coverages: '/coverage-levels',
+            maritalStatuses: '/marital-statuses',
+            homeOwnership: '/home-ownership-options',
+            carOwnership: '/car-ownership-options',
+            vehicleValues: '/vehicle-value-ranges',
+            drivingFrequency: '/driving-frequency-options',
+            quote: '/calculate-quote'
+        }
+    };
+
+    /**
+     * API client object
+     */
+    const api = {
+        /**
+         * Fetch options for a dropdown from the API.
+         *
+         * @param {string} endpoint - The endpoint path to fetch from
+         * @returns {Promise<Array>} Promise resolving to an array of options
+         */
+        fetchOptions: async function(endpoint) {
+            try {
+                // Make sure there's a slash between baseUrl and endpoint
+                const url = `${API_CONFIG.baseUrl}/${endpoint.startsWith('/') ? endpoint.substring(1) : endpoint}`;
+                console.log(`Fetching options from: ${url}`);
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Response not OK:', errorText);
+                    throw new Error(`Failed to fetch options: ${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log(`Received options for ${endpoint}:`, data);
+                return data;
+            } catch (error) {
+                console.error(`Error fetching options from ${endpoint}:`, error);
+                throw error;
+            }
+        },
+
+        fetchVehicleYears: async function() {
+            return this.fetchOptions(API_CONFIG.endpoints.years);
+        },
+
+        fetchVehicleCategories: async function() {
+            return this.fetchOptions(API_CONFIG.endpoints.categories);
+        },
+
+        fetchCoverageLevels: async function() {
+            return this.fetchOptions(API_CONFIG.endpoints.coverages);
+        },
+
+        fetchMaritalStatuses: async function() {
+            return this.fetchOptions(API_CONFIG.endpoints.maritalStatuses);
+        },
+
+        fetchHomeOwnershipOptions: async function() {
+            return this.fetchOptions(API_CONFIG.endpoints.homeOwnership);
+        },
+
+        fetchCarOwnershipOptions: async function() {
+            return this.fetchOptions(API_CONFIG.endpoints.carOwnership);
+        },
+
+        fetchVehicleValueRanges: async function() {
+            return this.fetchOptions(API_CONFIG.endpoints.vehicleValues);
+        },
+
+        fetchDrivingFrequencyOptions: async function() {
+            return this.fetchOptions(API_CONFIG.endpoints.drivingFrequency);
+        },
+
+        calculateQuote: async function(quoteParams) {
+            try {
+                // Make sure there's a slash between baseUrl and endpoint
+                const url = `${API_CONFIG.baseUrl}/${API_CONFIG.endpoints.quote.startsWith('/') ? API_CONFIG.endpoints.quote.substring(1) : API_CONFIG.endpoints.quote}`;
+                console.log('Sending quote request to:', url);
+                console.log('Quote parameters:', quoteParams);
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(quoteParams)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Error response:', errorData);
+                    throw new Error(errorData.detail || `Failed to calculate quote: ${response.status} ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                console.log('Quote result:', result);
+                return result;
+            } catch (error) {
+                console.error('Error calculating quote:', error);
+                throw error;
+            }
+        }
+    };
