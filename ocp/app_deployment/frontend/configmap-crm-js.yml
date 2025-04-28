@@ -8,7 +8,7 @@ metadata:
 data:
   crm.js: |
     // API endpoint base URL - update to match your deployment
-    const API_BASE_URL = '/api';
+    const API_BASE_URL = '';
 
     // Element references
     const quoteListElement = document.getElementById('quote-list');
