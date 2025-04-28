@@ -54,7 +54,7 @@ spec:
               fieldPath: metadata.namespace
         volumeMounts:
         - name: backend-data
-          mountPath: /app
+          mountPath: /app/data
       volumes:
       - name: backend-data
         persistentVolumeClaim:

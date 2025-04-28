@@ -2,6 +2,7 @@ resources:
   - backend/buildconfig.yml
   - backend/imagestream.yml
   - backend/deployment.yml
+  - backend/pvc.yml
   - backend/service.yml
   - backend/route.yml
   - frontend/configmap-nginx-conf.yml
