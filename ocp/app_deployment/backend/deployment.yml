@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: image-registry.openshift-image-registry.svc:5000/car-quote-app/car-quote-app-backend:latest
+        image: image-registry.openshift-image-registry.svc:5000/car-quote-demo/car-quote-app-backend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
