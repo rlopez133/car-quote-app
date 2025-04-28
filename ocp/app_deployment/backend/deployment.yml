@@ -52,3 +52,31 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        volumeMounts:
+        - name: backend-data
+          mountPath: /app
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+      volumes:
+      - name: backend-data
+        persistentVolumeClaim:
+          claimName: car-quote-app-backend-data
