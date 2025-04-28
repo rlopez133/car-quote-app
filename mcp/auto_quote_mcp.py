@@ -735,5 +735,144 @@ def _calculate_discounts(
     
     return discounts
 
+@mcp.tool()
+async def get_quotes() -> List[Dict[str, Any]]:
+    """
+    Get a list of all quotes in the system.
+    
+    Returns:
+        A list of quote objects.
+    """
+    # Implement logic to read from the data file
+    # This will need to use the same file path as your main API
+    quotes_path = "/app/data/quotes.json"
+    
+    if not os.path.exists(quotes_path):
+        return []
+    
+    with open(quotes_path, "r") as f:
+        return json.load(f)
+
+@mcp.tool()
+async def get_quote(quote_id: str) -> Dict[str, Any]:
+    """
+    Get details for a specific quote.
+    
+    Args:
+        quote_id: The ID of the quote to retrieve
+        
+    Returns:
+        A quote object or error if not found.
+    """
+    quotes = await get_quotes()
+    quote = next((q for q in quotes if q["id"] == quote_id), None)
+    
+    if not quote:
+        return {"error": f"Quote {quote_id} not found"}
+    
+    return quote
+
+@mcp.tool()
+async def update_quote_status(quote_id: str, status: str) -> Dict[str, Any]:
+    """
+    Update the status of a quote.
+    
+    Args:
+        quote_id: The ID of the quote to update
+        status: The new status (new, contacted, pending, converted)
+        
+    Returns:
+        Success or error message
+    """
+    quotes_path = "/app/data/quotes.json"
+    quotes = await get_quotes()
+    
+    # Find the quote index
+    quote_index = next((i for i, q in enumerate(quotes) if q["id"] == quote_id), None)
+    
+    if quote_index is None:
+        return {"error": f"Quote {quote_id} not found"}
+    
+    # Validate status
+    valid_statuses = ["new", "contacted", "pending", "converted"]
+    if status not in valid_statuses:
+        return {"error": f"Invalid status. Must be one of: {', '.join(valid_statuses)}"}
+    
+    # Update the quote
+    quotes[quote_index]["status"] = status
+    
+    # Save back to file
+    with open(quotes_path, "w") as f:
+        json.dump(quotes, f, indent=2)
+    
+    return {"success": True, "message": f"Quote {quote_id} status updated to {status}"}
+
+@mcp.tool()
+async def add_new_quote(quote_data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Add a new quote to the system.
+    
+    Args:
+        quote_data: Quote information including customer details
+        
+    Returns:
+        Success or error message
+    """
+    quotes_path = "/app/data/quotes.json"
+    quotes = await get_quotes()
+    
+    # Validate required fields
+    required_fields = ["customer", "email", "phone", "vehicle", "coverage", "premium", "zip"]
+    for field in required_fields:
+        if field not in quote_data:
+            return {"error": f"Missing required field: {field}"}
+    
+    # Generate a new ID
+    latest_id = max([int(q["id"].replace("Q", "")) for q in quotes]) if quotes else 1000
+    new_id = f"Q{latest_id + 1}"
+    
+    # Set defaults for optional fields
+    quote_data["id"] = new_id
+    quote_data["date"] = datetime.now().strftime("%Y-%m-%d")
+    quote_data["status"] = quote_data.get("status", "new")
+    
+    # Add to quotes list
+    quotes.append(quote_data)
+    
+    # Save back to file
+    with open(quotes_path, "w") as f:
+        json.dump(quotes, f, indent=2)
+    
+    return {"success": True, "message": f"Quote {new_id} added successfully", "quote_id": new_id}
+
+@mcp.tool()
+async def delete_quote(quote_id: str) -> Dict[str, Any]:
+    """
+    Delete a quote from the system.
+    
+    Args:
+        quote_id: The ID of the quote to delete
+        
+    Returns:
+        Success or error message
+    """
+    quotes_path = "/app/data/quotes.json"
+    quotes = await get_quotes()
+    
+    # Find the quote index
+    quote_index = next((i for i, q in enumerate(quotes) if q["id"] == quote_id), None)
+    
+    if quote_index is None:
+        return {"error": f"Quote {quote_id} not found"}
+    
+    # Remove the quote
+    removed_quote = quotes.pop(quote_index)
+    
+    # Save back to file
+    with open(quotes_path, "w") as f:
+        json.dump(quotes, f, indent=2)
+    
+    return {"success": True, "message": f"Quote {quote_id} deleted successfully"}
+
 if __name__ == "__main__":
     mcp.run(transport="sse")
