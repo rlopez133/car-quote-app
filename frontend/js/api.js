@@ -6,7 +6,8 @@
 // Configuration
 const API_CONFIG = {
     // Set the API base URL to your podman host access point
-    baseUrl: 'http://localhost:8000',
+    //baseUrl: 'http://localhost:8000',
+    baseUrl: 'http://car-quote-app-backend:8000',
     endpoints: {
         years: '/vehicle-years',
         categories: '/vehicle-categories',

@@ -17,6 +17,24 @@ spec:
         app: car-quote-app
         component: backend
     spec:
+      initContainers:
+      - name: init-data
+        image: busybox
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          mkdir -p /app/data
+          echo '[
+            {"id": "Q1001", "customer": "John Smith", "email": "john@example.com", "phone": "555-123-4567", "date": "2025-04-28", "vehicle": "2023 Toyota Camry (Standard)", "coverage": "Premium", "premium": "$1,250.00", "status": "new", "zip": "90210"},
+            {"id": "Q1002", "customer": "Maria Garcia", "email": "maria@example.com", "phone": "555-234-5678", "date": "2025-04-28", "vehicle": "2024 Honda Civic (Economy)", "coverage": "Standard", "premium": "$980.00", "status": "new", "zip": "33178"},
+            {"id": "Q1003", "customer": "Robert Johnson", "email": "robert@example.com", "phone": "555-345-6789", "date": "2025-04-27", "vehicle": "2022 Ford F-150 (Standard)", "coverage": "Premium", "premium": "$1,550.00", "status": "contacted", "zip": "60007"}
+          ]' > /app/data/quotes.json
+          chmod 666 /app/data/quotes.json
+          echo "Copied quotes.json to PVC"
+        volumeMounts:
+        - name: backend-data
+          mountPath: /app/data
       containers:
       - name: backend
         image: image-registry.openshift-image-registry.svc:5000/car-quote-demo/car-quote-app-backend:latest

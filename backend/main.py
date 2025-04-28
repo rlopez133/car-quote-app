@@ -32,7 +32,7 @@ class EmailRequest(BaseModel):
     message: Optional[str] = None
 
 # Path to the quotes JSON file
-QUOTES_FILE = "data/quotes.json"
+QUOTES_FILE = "/app/data/quotes.json"
 
 # Create FastAPI instance
 app = FastAPI(
