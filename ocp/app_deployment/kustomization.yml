@@ -10,6 +10,9 @@ resources:
   - frontend/configmap-css-styles.yml
   - frontend/configmap-js-api.yml
   - frontend/configmap-js-app.yml
+  - frontend/configmap-crm-html.yml
+  - frontend/configmap-crm-css.yml
+  - frontend/configmap-crm-js.yml
   - frontend/deployment.yml
   - frontend/service.yml
   - frontend/route.yml

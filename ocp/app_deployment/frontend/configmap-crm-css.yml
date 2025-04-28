@@ -1,0 +1,199 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: car-quote-app-crm-css
+  labels:
+    app: car-quote-app
+    component: frontend
+data:
+  crm.css: |
+    /* CRM specific styles */
+    .dashboard-header {
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .quote-table-container {
+        overflow-x: auto;
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .quote-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+    }
+
+    .quote-table th {
+        text-align: left;
+        padding: var(--spacing-sm) var(--spacing-md);
+        background-color: #f1f7fd;
+        border-bottom: 2px solid var(--color-border);
+        font-weight: 600;
+        color: var(--color-primary-dark);
+    }
+
+    .quote-table td {
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-bottom: 1px solid var(--color-border);
+        vertical-align: middle;
+    }
+
+    .quote-table tr:hover {
+        background-color: rgba(52, 152, 219, 0.05);
+    }
+
+    .quote-table .btn {
+        padding: var(--spacing-xs) var(--spacing-md);
+        margin-right: var(--spacing-xs);
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-transform: capitalize;
+    }
+
+    .status-badge.new {
+        background-color: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .status-badge.contacted {
+        background-color: #e8f5e9;
+        color: #388e3c;
+    }
+
+    .status-badge.pending {
+        background-color: #fff8e1;
+        color: #f57f17;
+    }
+
+    .status-badge.converted {
+        background-color: #e8eaf6;
+        color: #3f51b5;
+    }
+
+    .btn-view, .btn-email {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: 0.85rem;
+    }
+
+    .detail-view {
+        margin-top: var(--spacing-xl);
+        border-top: 1px solid var(--color-border);
+        padding-top: var(--spacing-lg);
+    }
+
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .detail-header h3 {
+        margin: 0;
+        color: var(--color-primary);
+    }
+
+    .detail-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: var(--spacing-lg);
+    }
+
+    .detail-section {
+        background-color: #f9f9f9;
+        border-radius: var(--border-radius);
+        padding: var(--spacing-md);
+    }
+
+    .detail-section h4 {
+        margin-top: 0;
+        margin-bottom: var(--spacing-md);
+        padding-bottom: var(--spacing-xs);
+        border-bottom: 1px solid var(--color-border);
+        color: var(--color-text);
+    }
+
+    .detail-item {
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .detail-label {
+        font-weight: 500;
+        color: var(--color-text-light);
+    }
+
+    .detail-value {
+        font-weight: 400;
+    }
+
+    .email-form {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        width: 90%;
+        max-width: 600px;
+        z-index: 1000;
+        box-shadow: var(--shadow-lg);
+        border-radius: var(--border-radius);
+        padding: var(--spacing-lg);
+    }
+
+    .email-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-lg);
+        padding-bottom: var(--spacing-sm);
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .email-header h3 {
+        margin: 0;
+        color: var(--color-primary);
+    }
+
+    .email-content .form-group {
+        margin-bottom: var(--spacing-md);
+    }
+
+    .email-content textarea {
+        width: 100%;
+        padding: var(--spacing-sm);
+        border: 1px solid var(--color-border);
+        border-radius: var(--border-radius);
+        font-size: 0.95rem;
+        font-family: var(--font-family);
+    }
+
+    .email-actions {
+        text-align: right;
+        margin-top: var(--spacing-lg);
+    }
+
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+
+    @media (max-width: 768px) {
+        .quote-table {
+            font-size: 0.85rem;
+        }
+        
+        .detail-content {
+            grid-template-columns: 1fr;
+        }
+    }

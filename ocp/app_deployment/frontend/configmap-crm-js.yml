@@ -1,0 +1,239 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: car-quote-app-crm-js
+  labels:
+    app: car-quote-app
+    component: frontend
+data:
+  crm.js: |
+    // API endpoint base URL - update to match your deployment
+    const API_BASE_URL = '/api';
+
+    // Element references
+    const quoteListElement = document.getElementById('quote-list');
+    const detailViewElement = document.getElementById('detail-view');
+    const detailContentElement = document.getElementById('detail-content');
+    const closeDetailButton = document.getElementById('close-detail');
+    const emailFormElement = document.getElementById('email-form');
+    const emailToElement = document.getElementById('email-to');
+    const closeEmailButton = document.getElementById('close-email');
+    const sendEmailButton = document.getElementById('send-email');
+    const emailSubjectElement = document.getElementById('email-subject');
+    const emailBodyElement = document.getElementById('email-body');
+
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            // Fetch quotes from the API
+            const quotes = await fetchQuotes();
+            renderQuotes(quotes);
+            
+            // Set up event listeners
+            closeDetailButton.addEventListener('click', function() {
+                detailViewElement.classList.add('hidden');
+            });
+            
+            closeEmailButton.addEventListener('click', function() {
+                emailFormElement.classList.add('hidden');
+                document.querySelector('.overlay')?.remove();
+            });
+            
+            sendEmailButton.addEventListener('click', async function() {
+                await sendEmail();
+            });
+        } catch (error) {
+            console.error('Error initializing application:', error);
+            alert('Failed to load quotes. Please try again later.');
+        }
+    });
+
+    // Fetch all quotes from the API
+    async function fetchQuotes() {
+        const response = await fetch(`${API_BASE_URL}/quotes`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch quotes: ${response.status}`);
+        }
+        return await response.json();
+    }
+
+    // Fetch a specific quote by ID
+    async function fetchQuote(quoteId) {
+        const response = await fetch(`${API_BASE_URL}/quotes/${quoteId}`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch quote ${quoteId}: ${response.status}`);
+        }
+        return await response.json();
+    }
+
+    // Render quotes in the table
+    function renderQuotes(quotes) {
+        quoteListElement.innerHTML = '';
+        
+        if (quotes.length === 0) {
+            const emptyRow = document.createElement('tr');
+            emptyRow.innerHTML = `<td colspan="6" style="text-align: center;">No quotes found.</td>`;
+            quoteListElement.appendChild(emptyRow);
+            return;
+        }
+        
+        quotes.forEach(quote => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${quote.customer}</td>
+                <td>${quote.id}</td>
+                <td>${quote.date}</td>
+                <td>${quote.premium}</td>
+                <td><span class="status-badge ${quote.status}">${quote.status}</span></td>
+                <td>
+                    <button class="btn btn-view" data-id="${quote.id}">View</button>
+                    <button class="btn btn-email" data-id="${quote.id}">Email</button>
+                </td>
+            `;
+            
+            quoteListElement.appendChild(row);
+        });
+        
+        // Add event listeners to buttons
+        document.querySelectorAll('.btn-view').forEach(btn => {
+            btn.addEventListener('click', function() {
+                viewQuoteDetails(btn.dataset.id);
+            });
+        });
+        
+        document.querySelectorAll('.btn-email').forEach(btn => {
+            btn.addEventListener('click', function() {
+                showEmailForm(btn.dataset.id);
+            });
+        });
+    }
+
+    // View quote details
+    async function viewQuoteDetails(quoteId) {
+        try {
+            const quote = await fetchQuote(quoteId);
+            
+            // Prepare the content
+            detailContentElement.innerHTML = `
+                <div class="detail-section">
+                    <h4>Customer Information</h4>
+                    <div class="detail-item">
+                        <span class="detail-label">Name:</span>
+                        <span class="detail-value">${quote.customer}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value">${quote.email}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Phone:</span>
+                        <span class="detail-value">${quote.phone}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">ZIP Code:</span>
+                        <span class="detail-value">${quote.zip}</span>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>Quote Information</h4>
+                    <div class="detail-item">
+                        <span class="detail-label">Quote ID:</span>
+                        <span class="detail-value">${quote.id}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Date Created:</span>
+                        <span class="detail-value">${quote.date}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Vehicle:</span>
+                        <span class="detail-value">${quote.vehicle}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Coverage Level:</span>
+                        <span class="detail-value">${quote.coverage}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Premium:</span>
+                        <span class="detail-value">${quote.premium}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value"><span class="status-badge ${quote.status}">${quote.status}</span></span>
+                    </div>
+                </div>
+            `;
+            
+            // Show the detail view
+            detailViewElement.classList.remove('hidden');
+            
+            // Scroll to the detail view
+            detailViewElement.scrollIntoView({ behavior: 'smooth' });
+        } catch (error) {
+            console.error('Error fetching quote details:', error);
+            alert('Failed to fetch quote details. Please try again.');
+        }
+    }
+
+    // Show email form
+    async function showEmailForm(quoteId) {
+        try {
+            const quote = await fetchQuote(quoteId);
+            
+            // Set up email form
+            emailToElement.value = quote.email;
+            emailToElement.dataset.quoteId = quoteId;
+            
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.classList.add('overlay');
+            document.body.appendChild(overlay);
+            
+            // Show email form
+            emailFormElement.classList.remove('hidden');
+        } catch (error) {
+            console.error('Error preparing email form:', error);
+            alert('Failed to prepare email. Please try again.');
+        }
+    }
+
+    // Send email and update status
+    async function sendEmail() {
+        const quoteId = emailToElement.dataset.quoteId;
+        const subject = emailSubjectElement.value;
+        const message = emailBodyElement.value;
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/quotes/${quoteId}/email`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    quote_id: quoteId,
+                    subject: subject,
+                    message: message
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to send email: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            
+            // Hide the email form
+            emailFormElement.classList.add('hidden');
+            document.querySelector('.overlay')?.remove();
+            
+            // Show success message
+            alert(result.message || 'Email sent successfully!');
+            
+            // Refresh the quotes to show updated status
+            const quotes = await fetchQuotes();
+            renderQuotes(quotes);
+        } catch (error) {
+            console.error('Error sending email:', error);
+            alert('Failed to send email. Please try again.');
+        }
+    }

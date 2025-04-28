@@ -9,7 +9,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 import uvicorn
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
+import json
+import os
+from pydantic import BaseModel
 
 # Import from local modules
 from models import (
@@ -17,6 +20,19 @@ from models import (
     MaritalStatus, HomeOwnership, CarOwnership, VehicleValue, DrivingFrequency
 )
 from calculator import calculate_insurance_quote
+
+# New models for CRM functionality
+class QuoteUpdate(BaseModel):
+    status: Optional[str] = None
+    notes: Optional[str] = None
+
+class EmailRequest(BaseModel):
+    quote_id: str
+    subject: Optional[str] = "Your Insurance Quote"
+    message: Optional[str] = None
+
+# Path to the quotes JSON file
+QUOTES_FILE = "quotes.json"
 
 # Create FastAPI instance
 app = FastAPI(
@@ -33,6 +49,39 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Helper functions for CRM
+def load_quotes():
+    """Load quotes from JSON file."""
+    if not os.path.exists(QUOTES_FILE):
+        # Initialize with mock data if file doesn't exist
+        mock_quotes = [
+            {"id": "Q1001", "customer": "John Smith", "email": "john@example.com", "phone": "555-123-4567", "date": "2025-04-27", "vehicle": "2023 Toyota Camry (Standard)", "coverage": "Premium", "premium": "$1,250.00", "status": "new", "zip": "90210"},
+            {"id": "Q1002", "customer": "Maria Garcia", "email": "maria@example.com", "phone": "555-234-5678", "date": "2025-04-27", "vehicle": "2024 Honda Civic (Economy)", "coverage": "Standard", "premium": "$980.00", "status": "new", "zip": "33178"},
+            {"id": "Q1003", "customer": "Robert Johnson", "email": "robert@example.com", "phone": "555-345-6789", "date": "2025-04-26", "vehicle": "2022 Ford F-150 (Standard)", "coverage": "Premium", "premium": "$1,550.00", "status": "contacted", "zip": "60007"},
+            {"id": "Q1004", "customer": "Sarah Williams", "email": "sarah@example.com", "phone": "555-456-7890", "date": "2025-04-26", "vehicle": "2024 Chevrolet Equinox (Standard)", "coverage": "Basic", "premium": "$820.00", "status": "pending", "zip": "10001"},
+            {"id": "Q1005", "customer": "Michael Brown", "email": "michael@example.com", "phone": "555-567-8901", "date": "2025-04-25", "vehicle": "2023 Tesla Model 3 (Luxury)", "coverage": "Premium", "premium": "$1,680.00", "status": "new", "zip": "98101"},
+            {"id": "Q1006", "customer": "Jennifer Davis", "email": "jennifer@example.com", "phone": "555-678-9012", "date": "2025-04-25", "vehicle": "2022 Nissan Altima (Standard)", "coverage": "Standard", "premium": "$1,020.00", "status": "converted", "zip": "75001"},
+            {"id": "Q1007", "customer": "David Miller", "email": "david@example.com", "phone": "555-789-0123", "date": "2025-04-24", "vehicle": "2025 Hyundai Tucson (Standard)", "coverage": "Basic", "premium": "$850.00", "status": "new", "zip": "20001"},
+            {"id": "Q1008", "customer": "Lisa Wilson", "email": "lisa@example.com", "phone": "555-890-1234", "date": "2025-04-24", "vehicle": "2021 BMW 3 Series (Luxury)", "coverage": "Premium", "premium": "$1,790.00", "status": "pending", "zip": "02108"},
+            {"id": "Q1009", "customer": "James Taylor", "email": "james@example.com", "phone": "555-901-2345", "date": "2025-04-23", "vehicle": "2024 Kia Sorento (Standard)", "coverage": "Standard", "premium": "$1,150.00", "status": "contacted", "zip": "80202"},
+            {"id": "Q1010", "customer": "Patricia Anderson", "email": "patricia@example.com", "phone": "555-012-3456", "date": "2025-04-23", "vehicle": "2022 Toyota RAV4 (Standard)", "coverage": "Basic", "premium": "$920.00", "status": "new", "zip": "30303"},
+            {"id": "Q1011", "customer": "Thomas Martinez", "email": "thomas@example.com", "phone": "555-123-4567", "date": "2025-04-22", "vehicle": "2023 Lexus ES (Luxury)", "coverage": "Premium", "premium": "$1,690.00", "status": "converted", "zip": "85001"},
+            {"id": "Q1012", "customer": "Elizabeth Robinson", "email": "elizabeth@example.com", "phone": "555-234-5678", "date": "2025-04-22", "vehicle": "2024 Honda Accord (Standard)", "coverage": "Standard", "premium": "$1,110.00", "status": "new", "zip": "46204"},
+            {"id": "Q1013", "customer": "Charles Clark", "email": "charles@example.com", "phone": "555-345-6789", "date": "2025-04-21", "vehicle": "2022 Ford Escape (Economy)", "coverage": "Basic", "premium": "$840.00", "status": "pending", "zip": "19019"},
+            {"id": "Q1014", "customer": "Susan Rodriguez", "email": "susan@example.com", "phone": "555-456-7890", "date": "2025-04-21", "vehicle": "2025 Audi A4 (Luxury)", "coverage": "Premium", "premium": "$1,850.00", "status": "new", "zip": "92101"},
+            {"id": "Q1015", "customer": "Joseph Lee", "email": "joseph@example.com", "phone": "555-567-8901", "date": "2025-04-20", "vehicle": "2023 Subaru Outback (Standard)", "coverage": "Standard", "premium": "$1,050.00", "status": "contacted", "zip": "97204"}
+        ]
+        save_quotes(mock_quotes)
+        return mock_quotes
+    
+    with open(QUOTES_FILE, "r") as f:
+        return json.load(f)
+
+def save_quotes(quotes):
+    """Save quotes to JSON file."""
+    with open(QUOTES_FILE, "w") as f:
+        json.dump(quotes, f, indent=2)
 
 @app.get("/")
 def read_root():
@@ -151,6 +200,64 @@ def calculate_quote(request: QuoteRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+# New CRM endpoints
+
+@app.get("/api/quotes")
+def list_quotes():
+    """Return all quotes for the CRM."""
+    return load_quotes()
+
+@app.get("/api/quotes/{quote_id}")
+def get_quote(quote_id: str):
+    """Retrieve details for a specific quote by ID."""
+    quotes = load_quotes()
+    quote = next((q for q in quotes if q["id"] == quote_id), None)
+    
+    if not quote:
+        raise HTTPException(status_code=404, detail=f"Quote {quote_id} not found")
+    
+    return quote
+
+@app.post("/api/quotes/{quote_id}")
+def post_quote(quote_id: str, update: QuoteUpdate):
+    """Update details for a specific quote by ID."""
+    quotes = load_quotes()
+    
+    quote_index = next((i for i, q in enumerate(quotes) if q["id"] == quote_id), None)
+    
+    if quote_index is None:
+        raise HTTPException(status_code=404, detail=f"Quote {quote_id} not found")
+    
+    # Update the fields
+    update_dict = update.dict(exclude_unset=True)
+    for key, value in update_dict.items():
+        quotes[quote_index][key] = value
+    
+    save_quotes(quotes)
+    
+    return {"success": True, "message": f"Quote {quote_id} updated successfully"}
+
+@app.post("/api/quotes/{quote_id}/email")
+def send_email(quote_id: str, email_request: EmailRequest):
+    """Send an email for a specific quote."""
+    quotes = load_quotes()
+    
+    quote = next((q for q in quotes if q["id"] == quote_id), None)
+    if not quote:
+        raise HTTPException(status_code=404, detail=f"Quote {quote_id} not found")
+    
+    # In a real implementation, you would send an actual email here
+    # For the demo, just update the status
+    quote_index = next((i for i, q in enumerate(quotes) if q["id"] == quote_id))
+    quotes[quote_index]["status"] = "contacted"
+    
+    save_quotes(quotes)
+    
+    return {
+        "success": True, 
+        "message": f"Email sent for quote {quote_id} to {quote['email']}"
+    }
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

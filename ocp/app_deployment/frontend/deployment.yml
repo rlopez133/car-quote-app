@@ -25,15 +25,16 @@ spec:
         - |
           # Create the directory structure
           mkdir -p /work/css /work/js
-
           # Copy all files to the shared volume
           echo "Copying HTML, CSS, and JS files..."
           cp /configmaps/index.html /work/
+          cp /configmaps/crm.html /work/  # New CRM HTML file
           cp /configmaps/css-normalize/normalize.css /work/css/
           cp /configmaps/css-styles/styles.css /work/css/
+          cp /configmaps/css-crm/crm.css /work/css/  # New CRM CSS file
           cp /configmaps/js-api/api.js /work/js/
           cp /configmaps/js-app/app.js /work/js/
-
+          cp /configmaps/js-crm/crm.js /work/js/  # New CRM JS file
           # Make content readable
           echo "Setting permissions..."
           find /work -type d -exec chmod 755 {} \;
@@ -45,14 +46,21 @@ spec:
         - name: nginx-index
           mountPath: /configmaps/index.html
           subPath: index.html
+        - name: nginx-crm-html  # New CRM HTML mount
+          mountPath: /configmaps/crm.html
+          subPath: crm.html
         - name: nginx-css-normalize
           mountPath: /configmaps/css-normalize
         - name: nginx-css-styles
           mountPath: /configmaps/css-styles
+        - name: nginx-css-crm  # New CRM CSS mount
+          mountPath: /configmaps/css-crm
         - name: nginx-js-api
           mountPath: /configmaps/js-api
         - name: nginx-js-app
           mountPath: /configmaps/js-app
+        - name: nginx-js-crm  # New CRM JS mount
+          mountPath: /configmaps/js-crm
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -115,15 +123,24 @@ spec:
       - name: nginx-index
         configMap:
           name: car-quote-app-index
+      - name: nginx-crm-html  # New CRM HTML volume
+        configMap:
+          name: car-quote-app-crm-html
       - name: nginx-css-normalize
         configMap:
           name: car-quote-app-css-normalize
       - name: nginx-css-styles
         configMap:
           name: car-quote-app-css-styles
+      - name: nginx-css-crm  # New CRM CSS volume
+        configMap:
+          name: car-quote-app-crm-css
       - name: nginx-js-api
         configMap:
           name: car-quote-app-js-api
       - name: nginx-js-app
         configMap:
           name: car-quote-app-js-app
+      - name: nginx-js-crm  # New CRM JS volume
+        configMap:
+          name: car-quote-app-crm-js

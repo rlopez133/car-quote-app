@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: car-quote-app-crm-html
+  labels:
+    app: car-quote-app
+    component: frontend
+data:
+  crm.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Parasol - Quote Management</title>
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/styles.css">
+        <link rel="stylesheet" href="css/crm.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <header class="site-header">
+            <div class="container">
+                <h1>Parasol Quote Management</h1>
+                <p class="tagline">Customer Relationship Management</p>
+            </div>
+        </header>
+
+        <main class="container">
+            <section class="crm-dashboard">
+                <div class="card">
+                    <div class="dashboard-header">
+                        <h2>Quotes</h2>
+                        <p>View and manage customer quotes.</p>
+                    </div>
+
+                    <div class="quote-table-container">
+                        <table class="quote-table">
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Quote ID</th>
+                                    <th>Date</th>
+                                    <th>Premium</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="quote-list">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="detail-view" class="detail-view hidden">
+                        <div class="detail-header">
+                            <h3>Quote Details</h3>
+                            <button id="close-detail" class="btn btn-secondary">Close</button>
+                        </div>
+                        <div id="detail-content" class="detail-content">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div id="email-form" class="email-form hidden">
+                        <div class="email-header">
+                            <h3>Send Email</h3>
+                            <button id="close-email" class="btn btn-secondary">Cancel</button>
+                        </div>
+                        <div class="email-content">
+                            <div class="form-group">
+                                <label for="email-to">To:</label>
+                                <input type="email" id="email-to" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="email-subject">Subject:</label>
+                                <input type="text" id="email-subject" value="Your Parasol Insurance Quote">
+                            </div>
+                            <div class="form-group">
+                                <label for="email-body">Message:</label>
+                                <textarea id="email-body" rows="6">Thank you for your interest in Parasol Insurance. Attached is your personalized quote based on the information you provided. If you have any questions or would like to discuss your coverage options, please don't hesitate to contact me directly.
+
+    Best regards,
+    Your Parasol Agent</textarea>
+                            </div>
+                            <div class="email-actions">
+                                <button id="send-email" class="btn btn-primary">Send Email</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <div class="container">
+                <p>&copy; 2025 Parasol Insurance. All rights reserved.</p>
+                <p class="disclaimer">Agent portal for demonstration purposes only.</p>
+            </div>
+        </footer>
+
+        <script src="js/crm.js"></script>
+    </body>
+    </html>

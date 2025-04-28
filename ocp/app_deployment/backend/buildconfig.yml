@@ -14,7 +14,7 @@ spec:
     type: Git
     git:
       uri: https://github.com/rlopez133/car-quote-app.git
-      ref: main
+      ref: app_update
     contextDir: backend
   strategy:
     type: Docker
