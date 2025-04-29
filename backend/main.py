@@ -47,7 +47,8 @@ QUOTES_FILE = "/app/data/quotes.json"
 app = FastAPI(
     title="QuoteMaster API",
     description="API for calculating vehicle insurance quotes",
-    version="2.0.0"
+    version="2.0.0",
+    servers=[{"url": "https://car-quote-app-backend-insurance-app.apps.ocp-beta-test.nerc.mghpcc.org", "description": "Demo dev"}]
 )
 
 # Configure CORS
