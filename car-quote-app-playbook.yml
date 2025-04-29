@@ -1,0 +1,79 @@
+---
+- name: Update Car Quote App Resources
+  hosts: localhost
+  gather_facts: no
+  
+  vars:
+    app_namespace: insurance-app
+    deployment_name: car-quote-app-backend
+    container_name: backend
+    cpu_limit: "800m"
+    memory_limit: "768Mi"
+    cpu_request: "300m"
+    memory_request: "384Mi"
+  
+  tasks:
+    - name: Get current deployment
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: Deployment
+        name: "{{ deployment_name }}"
+        namespace: "{{ app_namespace }}"
+      register: deployment_info
+      
+    - name: Display current resources
+      ansible.builtin.debug:
+        msg: >
+          Current CPU limit: {{ deployment_info.resources[0].spec.template.spec.containers | selectattr('name', 'equalto', container_name) | map(attribute='resources.limits.cpu') | first }}
+          Current Memory limit: {{ deployment_info.resources[0].spec.template.spec.containers | selectattr('name', 'equalto', container_name) | map(attribute='resources.limits.memory') | first }}
+          Current CPU request: {{ deployment_info.resources[0].spec.template.spec.containers | selectattr('name', 'equalto', container_name) | map(attribute='resources.requests.cpu') | first }}
+          Current Memory request: {{ deployment_info.resources[0].spec.template.spec.containers | selectattr('name', 'equalto', container_name) | map(attribute='resources.requests.memory') | first }}
+      when: deployment_info.resources | length > 0
+      
+#    - name: Update CPU and memory resources
+#      kubernetes.core.k8s:
+#        state: present
+#        namespace: "{{ app_namespace }}"
+#        definition:
+#          apiVersion: apps/v1
+#          kind: Deployment
+#          metadata:
+#            name: "{{ deployment_name }}"
+#            namespace: "{{ app_namespace }}"
+#          spec:
+#            template:
+#              spec:
+#                containers:
+#                  - name: "{{ container_name }}"
+#                    resources:
+#                      limits:
+#                        cpu: "{{ cpu_limit }}"
+#                        memory: "{{ memory_limit }}"
+#                      requests:
+#                        cpu: "{{ cpu_request }}"
+#                        memory: "{{ memory_request }}"
+#      register: update_result
+#    
+#    - name: Wait for deployment rollout
+#      ansible.builtin.command: oc rollout status deployment/{{ deployment_name }} -n {{ app_namespace }} --timeout=300s
+#      when: update_result is changed
+#      register: rollout_result
+#      failed_when: rollout_result.rc != 0
+#      
+#    - name: Verify updated resources
+#      kubernetes.core.k8s_info:
+#        api_version: apps/v1
+#        kind: Deployment
+#        name: "{{ deployment_name }}"
+#        namespace: "{{ app_namespace }}"
+#      register: updated_deployment
+#      when: rollout_result is defined
+#      
+#    - name: Display updated resources
+#      ansible.builtin.debug:
+#        msg: >
+#          Updated CPU limit: {{ updated_deployment.resources[0].spec.template.spec.containers | selectattr('name', 'equalto', container_name) | map(attribute='resources.limits.cpu') | first }}
+#          Updated Memory limit: {{ updated_deployment.resources[0].spec.template.spec.containers | selectattr('name', 'equalto', container_name) | map(attribute='resources.limits.memory') | first }}
+#          Updated CPU request: {{ updated_deployment.resources[0].spec.template.spec.containers | selectattr('name', 'equalto', container_name) | map(attribute='resources.requests.cpu') | first }}
+#          Updated Memory request: {{ updated_deployment.resources[0].spec.template.spec.containers | selectattr('name', 'equalto', container_name) | map(attribute='resources.requests.memory') | first }}
+#      when: updated_deployment.resources | length > 0
