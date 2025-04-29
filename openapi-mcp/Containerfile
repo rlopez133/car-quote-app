@@ -1,0 +1,10 @@
+FROM ghcr.io/loopwork-ai/emcee:latest AS emcee
+
+FROM node:20-slim
+
+# bring the emcee binary across and make it executable
+COPY --from=emcee /ko-app/emcee /usr/local/bin/emcee
+RUN chmod +x /usr/local/bin/emcee
+
+WORKDIR /workspace
+ENTRYPOINT ["bash"]

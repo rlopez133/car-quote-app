@@ -1,0 +1,80 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-app
+  labels:
+    app: test-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-app
+  template:
+    metadata:
+      labels:
+        app: test-app
+    spec:
+      containers:
+      - name: test-app
+        image: quay.io/shanand/car-quote-mcp:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+          name: http
+        command: ["npx", "-y", "supergateway", "--stdio"]
+        args: 
+        - "emcee"
+        - "$(OPENAPI_URL)"
+        - "--port"
+        - "8000"
+        - "--baseUrl"
+        - "$(BASE_URL)"
+        - "--ssePath"
+        - "/sse"
+        - "--messagePath"
+        - "/message"
+        env:
+        - name: OPENAPI_URL
+          value: "https://car-quote-app-backend-insurance-app.apps.ocp-beta-test.nerc.mghpcc.org/openapi.json"
+        - name: BASE_URL
+          value: "http://localhost:8000"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-app
+  labels:
+    app: test-app
+spec:
+  ports:
+  - port: 8000
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: test-app
+---
+# OpenShift Route
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: test-app
+  labels:
+    app: test-app
+spec:
+  to:
+    kind: Service
+    name: test-app
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
