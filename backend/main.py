@@ -23,8 +23,17 @@ from calculator import calculate_insurance_quote
 
 # New models for CRM functionality
 class QuoteUpdate(BaseModel):
+    #id: Optional[str] = None
+    customer: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    date: Optional[str] = None
+    vehicle: Optional[str] = None
+    coverage: Optional[str] = None
+    #premium: Optional[float] = None
     status: Optional[str] = None
-    notes: Optional[str] = None
+    #zip: Optional[int] = None
+
 
 class EmailRequest(BaseModel):
     quote_id: str
