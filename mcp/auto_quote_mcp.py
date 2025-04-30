@@ -17,7 +17,53 @@ import json
 # Initialize FastMCP
 mcp = FastMCP("auto_quote", port=8001 )
 
-BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000/")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
+
+@mcp.tool()
+async def calculate_quote(vehicle_category,
+    vehicle_year,
+    coverage_level,
+    marital_status,
+    age ,
+    home_ownership,
+    car_ownership,
+    vehicle_value,
+    driving_frequency,
+    zip_code,
+    ) -> Dict[str, Any]:
+    """
+    Calculate a new quote.
+    Args:
+        vehicle_category,
+        vehicle_year,
+        coverage_level,
+        marital_status,
+        age ,
+        home_ownership,
+        car_ownership,
+        vehicle_value,
+        driving_frequency,
+        zip_code,
+
+    Returns:
+        A quote object or error if not found.
+    """
+
+    data = dict()
+    data["vehicle_category"] = vehicle_category
+    data["vehicle_year"] = vehicle_year   
+    data["coverage_level"] = coverage_level  
+    data["marital_status"] = marital_status  
+    data["age"] = age  
+    data["home_ownership"] = home_ownership  
+    data["car_ownership"] = car_ownership  
+    data["vehicle_value"] = vehicle_value  
+    data["driving_frequency"] = driving_frequency
+    data["zip_code"] = zip_code
+    
+    response = requests.get(f"{BACKEND_URL}/calculate-quote",
+                            json=data)
+    return json.loads(response.content)
 
 @mcp.tool()
 async def get_quotes() -> List[Dict[str, Any]]:
