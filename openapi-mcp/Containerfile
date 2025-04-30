@@ -1,0 +1,20 @@
+FROM ghcr.io/loopwork-ai/emcee:latest AS emcee
+
+FROM registry.access.redhat.com/ubi9/nodejs-20
+
+# bring the emcee binary across
+COPY --from=emcee /ko-app/emcee /usr/local/bin/emcee
+
+# Update nodejs env vars [tbd: find a better solution]
+RUN mkdir -p /tmp/.npm-global
+RUN mkdir -p \
+      /tmp/.npm-global/bin \
+      /tmp/.npm-global/lib/node_modules \
+      /tmp/.npm-global/share \
+ && chmod -R 0777 /tmp/.npm-global         
+ENV NPM_CONFIG_PREFIX=/tmp/.npm-global \
+    NPM_CONFIG_CACHE=/tmp/.npm               \
+    PATH="/tmp/.npm-global/bin:${PATH}"
+
+
+ENTRYPOINT ["bash"]
