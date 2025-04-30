@@ -24,8 +24,7 @@ spec:
           name: http
         command: ["npx", "-y", "supergateway", "--stdio"]
         args: 
-        - "emcee"
-        - "$(OPENAPI_URL)"
+        - "emcee $(OPENAPI_URL)"
         - "--port"
         - "8000"
         - "--baseUrl"
@@ -39,6 +38,10 @@ spec:
           value: "https://car-quote-app-backend-insurance-app.apps.ocp-beta-test.nerc.mghpcc.org/openapi.json"
         - name: BASE_URL
           value: "http://localhost:8000"
+        - name: NPM_CONFIG_CACHE
+          value: "/tmp/.npm"
+        - name: NPM_CONFIG_PREFIX
+          value: "/tmp/.npm-global"
         resources:
           requests:
             cpu: "100m"
