@@ -150,7 +150,7 @@ def get_driving_frequency_options():
     return [option.value for option in DrivingFrequency]
 
 @app.post("/calculate-quote")
-def calculate_quote(request: QuoteRequest):
+def calculate_quote(request: Dict):
     """
     Calculate an insurance quote based on vehicle and driver details.
     
@@ -163,33 +163,33 @@ def calculate_quote(request: QuoteRequest):
     try:
         # Calculate quote using business logic from calculator module
         quote_result = calculate_insurance_quote(
-            vehicle_category=request.vehicle_category.value,
-            vehicle_year=request.vehicle_year,
-            coverage_level=request.coverage_level.value,
-            marital_status=request.marital_status.value,
-            age=request.age,
-            home_ownership=request.home_ownership.value,
-            car_ownership=request.car_ownership.value,
-            vehicle_value=request.vehicle_value.value,
-            driving_frequency=request.driving_frequency.value,
-            zip_code=request.zip_code
+            vehicle_category=request["vehicle_category"],
+            vehicle_year=request["vehicle_year"],
+            coverage_level=request["coverage_level"],
+            marital_status=request["marital_status"],
+            age=request["age"],
+            home_ownership=request["home_ownership"],
+            car_ownership=request["car_ownership"],
+            vehicle_value=request["vehicle_value"],
+            driving_frequency=request["driving_frequency"],
+            zip_code=request["zip_code"]
         )
         
         # Return formatted response
         return QuoteResponse(
             # Customer information
-            vehicle_category=request.vehicle_category.value,
-            vehicle_year=request.vehicle_year,
-            marital_status=request.marital_status.value,
-            age=request.age,
-            home_ownership=request.home_ownership.value,
-            car_ownership=request.car_ownership.value,
-            vehicle_value=request.vehicle_value.value,
-            driving_frequency=request.driving_frequency.value,
-            zip_code=request.zip_code,
+            vehicle_category=request["vehicle_category"],
+            vehicle_year=request["vehicle_year"],
+            marital_status=request["marital_status"],
+            age=request["age"],
+            home_ownership=request["home_ownership"],
+            car_ownership=request["car_ownership"],
+            vehicle_value=request["vehicle_value"],
+            driving_frequency=request["driving_frequency"],
+            zip_code=request["zip_code"],
             
             # Coverage selection
-            coverage_level=request.coverage_level.value,
+            coverage_level=request["coverage_level"],
             
             # Coverage details, factors, and totals from the calculator
             coverages=quote_result["coverages"],
