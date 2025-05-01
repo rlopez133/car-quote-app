@@ -34,6 +34,15 @@ data:
                     <p>Fill out the form below to receive an instant quote for your vehicle.</p>
 
                     <form id="quote-form" class="quote-form">
+
+                        <!-- Personal Information -->
+                        <div class="form-section">
+                            <h3>Personal Information</h3>
+                            <div class="form-group">
+                                <label for="customer-name">Name</label>
+                                <input type="text" id="customer-name" name="customer-name" required>
+                            </div>
+                        </div>
                         <!-- Vehicle Information -->
                         <div class="form-section">
                             <h3>Vehicle Information</h3>

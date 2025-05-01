@@ -24,6 +24,7 @@ from calculator import calculate_insurance_quote
 # New models for CRM functionality
 class QuoteUpdate(BaseModel):
     #id: Optional[str] = None
+    customer_name: Optional[str] = None
     customer: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
@@ -161,6 +162,9 @@ def calculate_quote(request: Dict):
         A QuoteResponse with quote details and price
     """
     try:
+        # Extract customer name for use in the quote result
+        customer_name = request.get("customer_name", "")
+
         # Calculate quote using business logic from calculator module
         quote_result = calculate_insurance_quote(
             vehicle_category=request["vehicle_category"],
@@ -178,6 +182,7 @@ def calculate_quote(request: Dict):
         # Return formatted response
         return QuoteResponse(
             # Customer information
+            customer_name=request["customer_name"].
             vehicle_category=request["vehicle_category"],
             vehicle_year=request["vehicle_year"],
             marital_status=request["marital_status"],

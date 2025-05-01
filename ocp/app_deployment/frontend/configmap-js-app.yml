@@ -166,6 +166,7 @@ data:
         try {
             // Get form values
             const quoteData = {
+                customer_name: document.getElementById('customer-name').value,
                 vehicle_category: document.getElementById('vehicle-category').value,
                 vehicle_year: parseInt(document.getElementById('vehicle-year').value),
                 coverage_level: document.querySelector('input[name="coverage-level"]:checked').value,

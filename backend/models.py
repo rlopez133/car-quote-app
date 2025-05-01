@@ -50,6 +50,10 @@ class QuoteRequest(BaseModel):
     """
     Model for insurance quote request data.
     """
+    customer_name: str = Field(
+        ..., 
+        description="Name of the customer requesting the quote"
+    )
     vehicle_category: VehicleCategory = Field(
         ..., 
         description="The category of the vehicle"
