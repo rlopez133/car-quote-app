@@ -68,8 +68,9 @@ def calculate_insurance_quote(
     
     total_discounts = sum(discount['amount'] for discount in discounts)
     
-    # Calculate final premium
+    # Calculate final premium with clean .00 ending
     final_premium = max(50, adjusted_premium - total_discounts)  # Minimum premium of $50
+    final_premium = round(final_premium / 5) * 5  # Round to nearest $5
     
     # Generate a quote ID and expiration date
     quote_id = f"QM-{datetime.now().strftime('%Y%m%d')}-{random.randint(1000, 9999)}"
@@ -88,7 +89,7 @@ def calculate_insurance_quote(
         "discounts": discounts,
         "subtotal": round(adjusted_premium, 2),
         "total_discounts": round(total_discounts, 2),
-        "final_premium": round(final_premium, 2),
+        "final_premium": float(int(final_premium)),
         "quote_id": quote_id,
         "expiration_date": expiration_date
     }
