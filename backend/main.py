@@ -182,7 +182,7 @@ def calculate_quote(request: Dict):
         # Return formatted response
         return QuoteResponse(
             # Customer information
-            customer_name=request["customer_name"].
+            customer_name=request["customer_name"],
             vehicle_category=request["vehicle_category"],
             vehicle_year=request["vehicle_year"],
             marital_status=request["marital_status"],
