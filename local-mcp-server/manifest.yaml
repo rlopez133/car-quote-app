@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: car-quote-mcp-server
+  labels:
+    app: car-quote-mcp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: car-quote-mcp-server
+  template:
+    metadata:
+      labels:
+        app: car-quote-mcp-server
+    spec:
+      containers:
+      - name: car-quote-mcp-server
+        image: quay.io/shanand/car-quote-local-mcp:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+          name: http
+        env:
+        - name: BACKEND_URL
+          value: "xx" # Add backend URL here
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: car-quote-mcp-server
+  labels:
+    app: car-quote-mcp-server
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  selector:
+    app: car-quote-mcp-server
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: car-quote-mcp-server
+spec:
+  to:
+    kind: Service
+    name: car-quote-mcp-server
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
