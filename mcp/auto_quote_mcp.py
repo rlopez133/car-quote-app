@@ -216,67 +216,6 @@ async def calculate_quote(
     except Exception as e:
         return {"error": f"Failed to calculate quote: {str(e)}"}
 
-@mcp.tool()
-async def add_new_quote(
-    customer: str,
-    email: str,
-    phone: str,
-    vehicle: str,
-    coverage: str,
-    quote_details: Dict[str, Any],
-    status: str = "new"
-) -> Dict[str, Any]:
-    """
-    Adds a completely new quote to the database. Does not send emails
-    
-    Args:
-        customer: Customer name
-        email: Customer email address
-        phone: Customer phone number
-        vehicle: Vehicle description 
-        coverage: Coverage level description
-        quote_details: The full quote details from calculate_quote
-        status: Quote status (default: "new")
-        
-    Returns:
-        Success or error message with the quote ID
-    """
-    try:
-        # Get a unique ID for the new quote
-        quotes = await list_quotes()
-        if isinstance(quotes, dict) and "error" in quotes:
-            return quotes  # Return the error
-            
-        # Generate a new quote ID
-        existing_ids = [q.get("id", "Q0") for q in quotes if isinstance(q, dict)]
-        numeric_parts = [int(qid.replace("Q", "")) for qid in existing_ids if qid.startswith("Q") and qid[1:].isdigit()]
-        next_number = max(numeric_parts, default=1000) + 1
-        quote_id = f"Q{next_number}"
-        
-        # Create the quote data
-        quote_data = {
-            "customer": customer,
-            "email": email,
-            "phone": phone,
-            "vehicle": vehicle,
-            "coverage": coverage,
-            "status": status,
-            "date": datetime.now().strftime("%Y-%m-%d"),
-            "premium": quote_details.get("premium", "Unknown"),
-            "details": quote_details
-        }
-        
-        # Save the quote
-        response = requests.post(f"{BACKEND_URL}/api/quotes/{quote_id}", json=quote_data)
-        response.raise_for_status()
-        
-        return {
-            "success": True,
-            "message": f"Quote {quote_id} saved successfully",
-            "quote_id": quote_id
-        }
-    except Exception as e:
-        return {"error": f"Failed to save quote: {str(e)}"}
 
 # Run the MCP server when this script is executed directly
 if __name__ == "__main__":
