@@ -31,9 +31,9 @@ class QuoteUpdate(BaseModel):
     date: Optional[str] = None
     vehicle: Optional[str] = None
     coverage: Optional[str] = None
-    #premium: Optional[float] = None
+    premium: Optional[str] = None
     status: Optional[str] = None
-    #zip: Optional[int] = None
+    zip: Optional[str] = None
 
 
 class EmailRequest(BaseModel):
@@ -49,7 +49,6 @@ app = FastAPI(
     title="QuoteMaster API",
     description="API for calculating vehicle insurance quotes",
     version="2.0.0",
-    servers=[{"url": "https://car-quote-app-backend-insurance-app.apps.ocp-beta-test.nerc.mghpcc.org", "description": "Demo dev"}]
 )
 
 # Configure CORS
