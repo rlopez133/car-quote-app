@@ -117,7 +117,8 @@ async def update_quote(
 @mcp.tool()
 async def send_quote_email(
     quote_id: str,
-    subject: str = "Your Insurance Quote",
+    email: str,
+    subject: str,
     message: Optional[str] = None
 ) -> Dict[str, Any]:
     """
@@ -125,6 +126,7 @@ async def send_quote_email(
     
     Args:
         quote_id: The ID of the quote to email
+        email: Email address of the customer
         subject: Email subject line
         message: Custom message to include in the email
         
